@@ -1,13 +1,14 @@
 {
   "name": "usuarios",
   "version": "1.0.0",
-  "description": "",
+  "description": "API usuarios",
   "main": "src/index.ts",
   "scripts": {
+    "start": "node index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Pedro, Julia",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -37,5 +38,13 @@
     "@types/pino": "^6.3.12",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.4.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MUISCDGTI/Usuarios.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MUISCDGTI/Usuarios/issues"
+  },
+  "homepage": "https://github.com/MUISCDGTI/Usuarios#readme"
 }
