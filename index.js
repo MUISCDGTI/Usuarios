@@ -1,17 +1,12 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-const { DH_NOT_SUITABLE_GENERATOR } = require('constants');
+var DataStore = require('nedb');
 
-var port = 8086;
+var port = 3000;
 var BASE_APPI_PATH = "/api/v1";
-
-var usuarios = [
-    {"usuario" : "juan" , "contraseña" : "pinjuan" , "email": "juan@gmail.com"},
-    {"usuario" : "maria" , "contraseña" : "pinmaria" , "email": "maria@gmail.com"}
-];
+var DB_FILE_NAME= __dirname + "/usuarios.json"
 
 console.log("Starting API server...");
-
 
 var app = express();
 app.use(bodyParser.json()); 

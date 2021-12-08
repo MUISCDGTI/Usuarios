@@ -41,7 +41,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MUISCDGTI/Usuarios"
+    "url": "git+https://github.com/MUISCDGTI/Usuarios.git"
   },
   "bugs": {
     "url": "https://github.com/MUISCDGTI/Usuarios/issues"
