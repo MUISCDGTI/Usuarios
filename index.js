@@ -2,7 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var DataStore = require('nedb');
 
-var port = 3001;
+var port = 3003;
 var BASE_APPI_PATH = "/api/v1";
 var DB_FILE_NAME= __dirname + "/usuarios.json"
 
@@ -22,7 +22,15 @@ app.get("/", (req, res) => {
 
 app.get(BASE_APPI_PATH + "/usuarios", (req, res) => {
     console.log(Date() + " - GET /usuarios");
-    res.send([]);
+
+    db.find({}, (err, usuarios) => {
+        if(err){
+            console.log(Date() + " - " + err);
+            res.sendStatus(500);
+        }else{
+            res.sendStatus(usuarios);
+        }
+    });
 });
 
 app.post(BASE_APPI_PATH + "/usuarios", (req, res) => {
