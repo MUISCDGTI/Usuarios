@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-const Contact = require('./contacts');
+const Usuario = require('./usuarios');
 
 var BASE_API_PATH = "/api/v1";
 
@@ -11,16 +11,16 @@ app.get("/", (req, res) => {
     res.send("<html><body><h1>My server</h1></body></html>");
 });
 
-app.get(BASE_API_PATH + "/contacts", (req, res) => {
-    console.log(Date() + " - GET /contacts");
+app.get(BASE_API_PATH + "/usuarios", (req, res) => {
+    console.log(Date() + " - GET /usuarios");
 
-    Contact.find({}, (err, contacts) => {
+    Usuario.find({}, (err, usuarios) => {
         if (err) {
             console.log(Date() + "-" + err);
             res.sendStatus(500);
         } else {
-            res.send(contacts.map((contact) => {
-                return contact.cleanup();
+            res.send(usuarios.map((usuario) => {
+                return usuario.cleanup();
             }));
         }
     });
@@ -31,10 +31,10 @@ app.get(BASE_API_PATH + "/healthz", (req, res) => {
     res.sendStatus(200);
 })
 
-app.post(BASE_API_PATH + "/contacts", (req, res) => {
-    console.log(Date() + " - POST /contacts");
-    var contact = req.body;
-    Contact.create(contact, (err) => {
+app.post(BASE_API_PATH + "/usuarios", (req, res) => {
+    console.log(Date() + " - POST /usuarios");
+    var usuario = req.body;
+    Usuario.create(usuario, (err) => {
         if (err) {
             console.log(Date() + " - " + err);
             res.sendStatus(500);

@@ -2,23 +2,29 @@
   "name": "usuarios",
   "version": "1.0.0",
   "description": "API usuarios",
-  "main": "src/index.ts",
-  "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
-  },
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MUISCDGTI/Usuarios.git"
   },
-  "bugs": {
-    "url": "https://github.com/MUISCDGTI/Usuarios/issues"
-  },
   "homepage": "https://github.com/MUISCDGTI/Usuarios",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
   "dependencies": {
     "express": "^4.17.1",
-    "mongoose": "^6.1.1",
+    "mongo": "^0.1.0",
+    "mongodb": "^4.2.1",
+    "mongoose": "^5.13.13",
     "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0",
+    "jest-extended": "^0.11.2",
+    "supertest": "^4.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/MUISCDGTI/Usuarios/issues"
   }
 }
