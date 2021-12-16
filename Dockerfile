@@ -1,17 +1,13 @@
-FROM node:12-alpine
+FROM node:14 as dev
 
-WORKDIR /app
+WORKDIR /src
 
-COPY package.json .
-COPY package-lock.json .
-
+COPY package.json package-lock.json ./
 RUN npm install
+COPY . .
 
-COPY index.js .
-COPY db.js .
-COPY server.js .
-COPY contacts.js .
+RUN npm run build
 
-EXPOSE 3000
-
-CMD npm start
+FROM nginx:alpine
+COPY --from=dev /src/build /usr/share/nginx/html
+EXPOSE 80

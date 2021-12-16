@@ -1,7 +1,5 @@
 tag: dev
 
-api:
+frontend:
   replicaCount: 1
-  image: okteto.dev/api
-
-contactsMongoUrl: mongodb://mongo/test
+  image: okteto.dev/frontend

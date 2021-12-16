@@ -1,6 +1,6 @@
 apiVersion: v2
-name: fis-contacts-backend
-description: A backend for contacts
+name: fis-contacts-frontend
+description: A frontend for contacts
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
