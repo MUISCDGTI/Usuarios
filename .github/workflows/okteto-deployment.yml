@@ -5,10 +5,14 @@ name: Okteto Deployment
 # Controls when the workflow will run
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
-  build:
+  test:
+    uses: resinas/fis-contacts-backend/.github/workflows/tests.yml@main
+    
+  deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +26,5 @@ jobs:
       - name: Okteto Pipeline
         uses: okteto/pipeline@latest
         with:
-          name: fis-usuarios-backend
-          namespace: fis-julgargal
-
+          name: fis-contacts-backend
+          namespace: fis-resinas

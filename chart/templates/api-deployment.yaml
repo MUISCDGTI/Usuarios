@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: api
   labels:
-    {{- include "usuarios.labels" . | nindent 4 }}
+    {{- include "contacts.labels" . | nindent 4 }}
     app.kubernetes.io/component: api
 spec:
   replicas: {{ .Values.api.replicaCount }}
@@ -21,16 +21,24 @@ spec:
       containers:
         - name: api
           image: {{ .Values.api.image }}:{{ .Values.tag }}
+          env:
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                    name: mongodb
+                    key: contacts_mongo_url
           ports:
             - name: http
               containerPort: 3000
               protocol: TCP
           readinessProbe:
+            initialDelaySeconds: 10
             periodSeconds: 1
             httpGet:
               path: /api/v1/healthz
               port: 3000
           livenessProbe:
+            initialDelaySeconds: 10
             periodSeconds: 1
             httpGet:
               path: /api/v1/healthz

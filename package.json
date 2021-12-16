@@ -1,23 +1,30 @@
 {
-  "name": "usuarios",
+  "name": "contacts",
   "version": "1.0.0",
-  "description": "API usuarios",
-  "main": "src/index.ts",
+  "description": "API Contacts",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MUISCDGTI/Usuarios.git"
+    "url": "https://github.com/resinas/fis-contacts-backend.git"
   },
+  "author": "Manuel Resinas",
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MUISCDGTI/Usuarios/issues"
+    "url": "https://github.com/resinas/fis-contacts-backend/issues"
   },
-  "homepage": "https://github.com/MUISCDGTI/Usuarios",
+  "homepage": "https://github.com/resinas/fis-contacts-backend#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "mongoose": "^6.1.2",
     "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "jest": "^27.4.5",
+    "jest-extended": "^1.2.0",
+    "supertest": "^6.1.6"
   }
 }

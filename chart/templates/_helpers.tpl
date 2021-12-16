@@ -2,15 +2,15 @@
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "usuarios.chart" -}}
+{{- define "contacts.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "usuarios.labels" -}}
-helm.sh/chart: {{ include "usuarios.chart" . }}
+{{- define "contacts.labels" -}}
+helm.sh/chart: {{ include "contacts.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
