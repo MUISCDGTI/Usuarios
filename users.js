@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.cleanup = function () {
-  return { email: this.email, name: this.name };
+  return { id: this._id, email: this.email, name: this.name };
 }
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
@@ -23,6 +23,13 @@ userSchema.pre('save', async function (next) {
 
   const hash = bcrypt.hashSync(this.password, SALT_WORK_FACTOR);
   this.password = hash;
+
+  return next();
+});
+
+userSchema.pre('findOneAndUpdate', async function (next) {
+  const hash = bcrypt.hashSync(this._update.password, SALT_WORK_FACTOR);
+  this._update.password = hash;
 
   return next();
 });
