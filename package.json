@@ -26,5 +26,10 @@
   },
   "bugs": {
     "url": "https://github.com/MUISCDGTI/Usuarios/issues"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "author": "",
+  "license": "ISC"
 }
