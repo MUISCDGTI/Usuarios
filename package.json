@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/MUISCDGTI/Usuarios",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "express": "^4.17.1",
-    "nedb": "^1.8.0"
+    "mongoose": "^6.1.1"
   }
 }
