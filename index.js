@@ -49,6 +49,33 @@ app.post(BASE_API_PATH + "/usuarios", (req, res) => {
     });
 });
 
+app.put(BASE_API_PATH + "/usuarios/:id", (req, res) => {
+    const { id } = req.params;
+    const { email, name, password } = req.body;
+    console.log(`${Date()} - PUT /usuarios/${id}`);
+    User.findByIdAndUpdate(id, { email, name, password }, (err) => {
+        if (err) {
+            console.log(Date() + " - " + err);
+            res.sendStatus(500);
+        } else {
+            res.sendStatus(200);
+        }
+    });
+});
+
+app.delete(BASE_API_PATH + "/usuarios/:id", (req, res) => {
+    const { id } = req.params;
+    console.log(`${Date()} - DELETE /usuarios/${id}`);
+    User.findByIdAndDelete(id, (err) => {
+        if (err) {
+            console.log(Date() + " - " + err);
+            res.sendStatus(500);
+        } else {
+            res.sendStatus(204);
+        }
+    })
+});
+
 dbConnect().then(
     () => {
         app.listen(port);
