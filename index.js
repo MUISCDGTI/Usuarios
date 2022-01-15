@@ -1,11 +1,21 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var jwt = require('jsonwebtoken');
+const express = require('express');
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
-var port = 3000;
-var BASE_API_PATH = "/api/v1";
-var ACCESS_TOKEN_SECRET = (process.env.ACCESS_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
-var REFRESH_TOKEN_SECRET = (process.env.REFRESH_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
+const swaggerUi = require('swagger-ui-express');
+const swaggerDoc = require('./swagger.json');
+
+const cors = require('cors')
+
+const corsOptions = {
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}
+
+const port = 3000;
+const BASE_API_PATH = "/api/v1";
+const ACCESS_TOKEN_SECRET = (process.env.ACCESS_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
+const REFRESH_TOKEN_SECRET = (process.env.REFRESH_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
 
 const dbConnect = require('./db');
 const User = require('./users');
@@ -13,8 +23,10 @@ const RefreshToken = require('./refreshTokens');
 
 console.log("Starting API server...");
 
-var app = express();
+const app = express();
 app.use(bodyParser.json());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+app.use(cors(corsOptions))
 
 app.get("/", (req, res) => {
     res.send("<html><body><h1>My server</h1></body></html>");
@@ -24,7 +36,7 @@ app.get(BASE_API_PATH + "/healthz", (req, res) => {
     res.sendStatus(200);
 });
 
-app.get(BASE_API_PATH + "/usuarios", authenticateTokenMiddleware, (req, res) => {
+app.get(BASE_API_PATH + "/users", authenticateTokenMiddleware, (req, res) => {
     console.log(Date() + " - GET /usuarios");
 
     User.find({}, (err, usuarios) => {
@@ -40,9 +52,9 @@ app.get(BASE_API_PATH + "/usuarios", authenticateTokenMiddleware, (req, res) => 
 
 });
 
-app.post(BASE_API_PATH + "/usuarios", (req, res) => {
+app.post(BASE_API_PATH + "/users", (req, res) => {
     console.log(Date() + " - POST /usuarios");
-    var usuario = req.body;
+    const usuario = req.body;
     User.create(usuario, (err) => {
         if (err) {
             console.log(Date() + " - " + err);
@@ -53,7 +65,7 @@ app.post(BASE_API_PATH + "/usuarios", (req, res) => {
     });
 });
 
-app.put(BASE_API_PATH + "/usuarios/:id", authenticateTokenMiddleware, (req, res) => {
+app.put(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, (req, res) => {
     const { id } = req.params;
     const { email, name, password } = req.body;
     console.log(`${Date()} - PUT /usuarios/${id}`);
@@ -62,12 +74,12 @@ app.put(BASE_API_PATH + "/usuarios/:id", authenticateTokenMiddleware, (req, res)
             console.log(Date() + " - " + err);
             res.sendStatus(500);
         } else {
-            res.sendStatus(200);
+            res.status(200).send({ id, name, email });
         }
     });
 });
 
-app.delete(BASE_API_PATH + "/usuarios/:id", authenticateTokenMiddleware, (req, res) => {
+app.delete(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, (req, res) => {
     const { id } = req.params;
     console.log(`${Date()} - DELETE /usuarios/${id}`);
     User.findByIdAndDelete(id, (err) => {
@@ -110,9 +122,9 @@ app.post("/login", async (req, res) => {
 
 });
 
-app.post('/token', (req, res) => {
-    console.log(`${Date()} - POST /token`);
-    const refreshToken = req.body.token;
+app.post('/refreshToken', (req, res) => {
+    console.log(`${Date()} - POST /refreshToken`);
+    const refreshToken = req.body.refreshToken;
 
     RefreshToken.find({ value: refreshToken }, (err, tokens) => {
         if (err) {
@@ -145,7 +157,7 @@ app.delete("/logout", (req, res) => {
 app.post("/isAuthenticated", (req, res) => {
     console.log(`${Date()} - POST /isAuthenticated`);
     const accessToken = req.body.token;
-    isTokenAuthenticated(accessToken) ? res.sendStatus(200) : res.sendStatus(403);
+    isTokenAuthenticated(accessToken) ? res.sendStatus(204) : res.sendStatus(403);
 });
 
 function generatePermanentAccessToken(userInfo) {
@@ -160,7 +172,7 @@ function generateRefreshToken(userInfo) {
 }
 
 function authenticateTokenMiddleware(req, res, next) {
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers['Authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) return res.sendStatus(401);
