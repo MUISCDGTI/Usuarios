@@ -1,11 +1,21 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var jwt = require('jsonwebtoken');
+const express = require('express');
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
-var port = 3000;
-var BASE_API_PATH = "/api/v1";
-var ACCESS_TOKEN_SECRET = (process.env.ACCESS_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
-var REFRESH_TOKEN_SECRET = (process.env.REFRESH_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
+const swaggerUi = require('swagger-ui-express');
+const swaggerDoc = require('./swagger.json');
+
+const cors = require('cors')
+
+const corsOptions = {
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}
+
+const port = 3000;
+const BASE_API_PATH = "/api/v1";
+const ACCESS_TOKEN_SECRET = (process.env.ACCESS_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
+const REFRESH_TOKEN_SECRET = (process.env.REFRESH_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
 
 const dbConnect = require('./db');
 const User = require('./users');
@@ -13,8 +23,10 @@ const RefreshToken = require('./refreshTokens');
 
 console.log("Starting API server...");
 
-var app = express();
+const app = express();
 app.use(bodyParser.json());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+app.use(cors(corsOptions))
 
 app.get("/", (req, res) => {
     res.send("<html><body><h1>My server</h1></body></html>");
@@ -24,7 +36,7 @@ app.get(BASE_API_PATH + "/healthz", (req, res) => {
     res.sendStatus(200);
 });
 
-app.get(BASE_API_PATH + "/usuarios", authenticateTokenMiddleware, (req, res) => {
+app.get(BASE_API_PATH + "/users", authenticateTokenMiddleware, (req, res) => {
     console.log(Date() + " - GET /usuarios");
 
     User.find({}, (err, usuarios) => {
@@ -40,34 +52,35 @@ app.get(BASE_API_PATH + "/usuarios", authenticateTokenMiddleware, (req, res) => 
 
 });
 
-app.post(BASE_API_PATH + "/usuarios", (req, res) => {
+app.post(BASE_API_PATH + "/users", (req, res) => {
     console.log(Date() + " - POST /usuarios");
-    var usuario = req.body;
-    User.create(usuario, (err) => {
+    const usuario = req.body;
+    User.create(usuario, (err, usr) => {
         if (err) {
             console.log(Date() + " - " + err);
             res.sendStatus(500);
         } else {
-            res.sendStatus(201);
+            res.json(usr.cleanup());
         }
     });
 });
 
-app.put(BASE_API_PATH + "/usuarios/:id", authenticateTokenMiddleware, (req, res) => {
+app.put(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, (req, res) => {
     const { id } = req.params;
     const { email, name, password } = req.body;
     console.log(`${Date()} - PUT /usuarios/${id}`);
+    if (!email || !name || !password) return res.sendStatus(400);
     User.findByIdAndUpdate(id, { email, name, password }, (err) => {
         if (err) {
             console.log(Date() + " - " + err);
             res.sendStatus(500);
         } else {
-            res.sendStatus(200);
+            res.status(200).send({ id, name, email });
         }
     });
 });
 
-app.delete(BASE_API_PATH + "/usuarios/:id", authenticateTokenMiddleware, (req, res) => {
+app.delete(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, (req, res) => {
     const { id } = req.params;
     console.log(`${Date()} - DELETE /usuarios/${id}`);
     User.findByIdAndDelete(id, (err) => {
@@ -98,9 +111,9 @@ app.post("/login", async (req, res) => {
         const accessToken = generatePermanentAccessToken(userInfo);
         const refreshToken = generateRefreshToken(userInfo);
 
-        RefreshToken.create({ value: refreshToken }, (err) => {
-            if (err) {
-                console.log(Date() + " - " + err);
+        RefreshToken.create({ value: refreshToken }, (error) => {
+            if (error) {
+                console.log(Date() + " - " + error);
                 res.sendStatus(500);
             } else {
                 res.json({ accessToken, refreshToken });
@@ -110,9 +123,9 @@ app.post("/login", async (req, res) => {
 
 });
 
-app.post('/token', (req, res) => {
-    console.log(`${Date()} - POST /token`);
-    const refreshToken = req.body.token;
+app.post('/refreshToken', (req, res) => {
+    console.log(`${Date()} - POST /refreshToken`);
+    const refreshToken = req.body.refreshToken;
 
     RefreshToken.find({ value: refreshToken }, (err, tokens) => {
         if (err) {
@@ -145,7 +158,7 @@ app.delete("/logout", (req, res) => {
 app.post("/isAuthenticated", (req, res) => {
     console.log(`${Date()} - POST /isAuthenticated`);
     const accessToken = req.body.token;
-    isTokenAuthenticated(accessToken) ? res.sendStatus(200) : res.sendStatus(403);
+    isTokenAuthenticated(accessToken) ? res.sendStatus(204) : res.sendStatus(403);
 });
 
 function generatePermanentAccessToken(userInfo) {
@@ -167,7 +180,7 @@ function authenticateTokenMiddleware(req, res, next) {
 
     jwt.verify(token, ACCESS_TOKEN_SECRET, (err, usr) => {
         if (err) return res.sendStatus(403);
-        req.user = user;
+        req.user = usr;
         next();
     });
 }
