@@ -69,6 +69,7 @@ app.put(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, (req, res) =>
     const { id } = req.params;
     const { email, name, password } = req.body;
     console.log(`${Date()} - PUT /usuarios/${id}`);
+    if (!email || !name || !password) return res.sendStatus(400);
     User.findByIdAndUpdate(id, { email, name, password }, (err) => {
         if (err) {
             console.log(Date() + " - " + err);
