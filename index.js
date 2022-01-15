@@ -55,12 +55,12 @@ app.get(BASE_API_PATH + "/users", authenticateTokenMiddleware, (req, res) => {
 app.post(BASE_API_PATH + "/users", (req, res) => {
     console.log(Date() + " - POST /usuarios");
     const usuario = req.body;
-    User.create(usuario, (err) => {
+    User.create(usuario, (err, usr) => {
         if (err) {
             console.log(Date() + " - " + err);
             res.sendStatus(500);
         } else {
-            res.sendStatus(201);
+            res.json(usr.cleanup());
         }
     });
 });
@@ -110,9 +110,9 @@ app.post("/login", async (req, res) => {
         const accessToken = generatePermanentAccessToken(userInfo);
         const refreshToken = generateRefreshToken(userInfo);
 
-        RefreshToken.create({ value: refreshToken }, (err) => {
-            if (err) {
-                console.log(Date() + " - " + err);
+        RefreshToken.create({ value: refreshToken }, (error) => {
+            if (error) {
+                console.log(Date() + " - " + error);
                 res.sendStatus(500);
             } else {
                 res.json({ accessToken, refreshToken });
@@ -172,14 +172,14 @@ function generateRefreshToken(userInfo) {
 }
 
 function authenticateTokenMiddleware(req, res, next) {
-    const authHeader = req.headers['Authorization'];
+    const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) return res.sendStatus(401);
 
     jwt.verify(token, ACCESS_TOKEN_SECRET, (err, usr) => {
         if (err) return res.sendStatus(403);
-        req.user = user;
+        req.user = usr;
         next();
     });
 }
