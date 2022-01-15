@@ -1,3 +1,3 @@
 deploy:
 - okteto build -t okteto.dev/api:${OKTETO_GIT_COMMIT} .
-- helm upgrade --install usuarios-backend chart --set tag=${OKTETO_GIT_COMMIT} --set mongoUrl=$MONGO_URL --set accessTokenSecret=$ACCESS_TOKEN_SECRET --set refreshTokenSecret=$REFRESH_TOKEN_SECRET
+- helm upgrade --install usuarios-backend chart --set tag=${OKTETO_GIT_COMMIT}
