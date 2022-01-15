@@ -11,6 +11,7 @@ COPY index.js .
 COPY db.js .
 COPY users.js .
 COPY refreshTokens.js .
+COPY swagger.json .
 
 EXPOSE 3000
 
