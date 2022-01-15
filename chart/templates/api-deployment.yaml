@@ -30,12 +30,12 @@ spec:
             - name: ACCESS_TOKEN_SECRET
               valueFrom:
                 secretKeyRef:
-                    name: accessTokenSecret
+                    name: access-token-secret
                     key: access_token_secret
             - name: REFRESH_TOKEN_SECRET
               valueFrom:
                 secretKeyRef:
-                    name: refreshTokenSecret
+                    name: refresh-token-secret
                     key: refresh_token_secret
           ports:
             - name: http
