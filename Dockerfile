@@ -10,6 +10,7 @@ RUN npm install
 COPY index.js .
 COPY db.js .
 COPY users.js .
+COPY refreshTokens.js .
 
 EXPOSE 3000
 
