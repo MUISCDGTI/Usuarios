@@ -158,7 +158,7 @@ app.delete("/logout", (req, res) => {
 app.post("/isAuthenticated", (req, res) => {
     console.log(`${Date()} - POST /isAuthenticated`);
     const accessToken = req.body.token;
-    isTokenAuthenticated(accessToken) ? res.sendStatus(204) : res.sendStatus(403);
+    isTokenAuthenticated(accessToken, (isAuth) => isAuth ? res.sendStatus(204) : res.sendStatus(403));
 });
 
 function generatePermanentAccessToken(userInfo) {
@@ -185,12 +185,10 @@ function authenticateTokenMiddleware(req, res, next) {
     });
 }
 
-function isTokenAuthenticated(token) {
-    if (!token) return false;
+function isTokenAuthenticated(token, callback) {
+    if (!token) return callback(false);
 
-    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, usr) => {
-        return err ? false : true;
-    });
+    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, usr) => callback(err ? false : true));
 }
 
 dbConnect().then(
