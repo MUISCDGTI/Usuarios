@@ -116,7 +116,7 @@ app.post("/login", async (req, res) => {
                 console.log(Date() + " - " + error);
                 res.sendStatus(500);
             } else {
-                res.json({ accessToken, refreshToken });
+                res.json({ accessToken, refreshToken, userInfo: usr.cleanup() });
             }
         });
     });
