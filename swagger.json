@@ -332,6 +332,9 @@
         },
         "refreshToken": {
           "type": "string"
+        },
+        "userInfo": {
+          "$ref": "#/definitions/UserResponse"
         }
       }
     },
