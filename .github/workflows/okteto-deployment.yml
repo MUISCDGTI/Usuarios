@@ -8,7 +8,11 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
+    uses: MUISCDGTI/Usuarios/.github/workflows/tests.yaml@main
+    
+  deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
