@@ -14,6 +14,8 @@ COPY refreshTokens.js .
 COPY swagger.json .
 COPY run.js .
 COPY authenticationMiddleware.js .
+COPY ratingsResource.js .
+COPY suscriptionsResource.js .
 
 EXPOSE 3000
 
