@@ -37,4 +37,4 @@ jobs:
     - run: npm test
     - run: npm run integration
       env:
-        MONGO_URL: ${{ secrets.MONGO_URL }}
+        MONGO_URL: "mongodb://localhost/test"
