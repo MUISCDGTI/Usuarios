@@ -5,12 +5,12 @@ const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require('./swagger.json');
 
-const cors = require('cors')
+const cors = require('cors');
 
 const corsOptions = {
     methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
-}
+};
 
 const BASE_API_PATH = "/api/v1";
 const ACCESS_TOKEN_SECRET = (process.env.ACCESS_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
@@ -19,6 +19,9 @@ const REFRESH_TOKEN_SECRET = (process.env.REFRESH_TOKEN_SECRET || "CHANGE_THIS_S
 const User = require('./users');
 const RefreshToken = require('./refreshTokens');
 const authenticateTokenMiddleware = require('./authenticationMiddleware');
+
+const RatingsResource = require('./ratingsResource');
+const SuscriptionsResource = require('./suscriptionsResource');
 
 console.log("Starting API server...");
 
@@ -57,7 +60,7 @@ app.post(BASE_API_PATH + "/users", (req, res) => {
     User.create(usuario, (err, usr) => {
         if (err) {
             console.log(Date() + " - " + err);
-            res.sendStatus(500);
+            res.status(500).send("User or email already in use.");
         } else {
             res.status(201).json(usr.cleanup());
         }
@@ -79,17 +82,27 @@ app.put(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, (req, res) =>
     });
 });
 
-app.delete(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, (req, res) => {
+app.delete(BASE_API_PATH + "/users/:id", authenticateTokenMiddleware, async (req, res) => {
     const { id } = req.params;
     console.log(`${Date()} - DELETE /usuarios/${id}`);
-    User.findByIdAndDelete(id, (err) => {
-        if (err) {
-            console.log(Date() + " - " + err);
-            res.sendStatus(500);
-        } else {
-            res.sendStatus(204);
-        }
-    });
+    try {
+        const usr = await User.findById(id).exec();
+        // TODO: test when filtering at getUserRatings works to avoid deleting all ratings
+        // const ratings = await RatingsResource.getUserRatings(usr.name)
+        // ratings.forEach(async rating => {
+        //     await RatingsResource.deleteRating(rating.id);
+        // });
+        const suscriptionsApiKey = req.headers['authorization'].split(' ')[1];
+        const suscriptions = await SuscriptionsResource.getUserSuscriptions(usr.email, suscriptionsApiKey);
+        suscriptions.forEach(async suscription => {
+            await SuscriptionsResource.deleteSuscription(suscription._id, suscriptionsApiKey);
+        });
+        await User.deleteOne({ _id: usr._id }).exec();
+        res.sendStatus(204);
+    } catch (error) {
+        console.log(Date() + " Error - " + error);
+        return res.sendStatus(500);
+    }
 });
 
 app.post("/login", async (req, res) => {
