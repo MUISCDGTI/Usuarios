@@ -12,6 +12,8 @@ COPY db.js .
 COPY users.js .
 COPY refreshTokens.js .
 COPY swagger.json .
+COPY run.js .
+COPY authenticationMiddleware.js .
 
 EXPOSE 3000
 
