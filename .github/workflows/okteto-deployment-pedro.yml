@@ -19,8 +19,7 @@ jobs:
       - name: Okteto Login
         uses: okteto/login@latest
         with:
-          # Your okteto API token (changeit) ${{ secrets.OKTETO_TOKEN_PEDRO }}
-          token: 0SElSyHxMULypfGhuIwD35GZivLU5w0JWIusfEcF1c3km362
+          token: ${{ secrets.OKTETO_PEDRO }}
           
       - name: Okteto Pipeline
         uses: okteto/pipeline@latest
