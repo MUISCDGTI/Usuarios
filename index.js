@@ -12,14 +12,13 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization']
 }
 
-const port = 3000;
 const BASE_API_PATH = "/api/v1";
 const ACCESS_TOKEN_SECRET = (process.env.ACCESS_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
 const REFRESH_TOKEN_SECRET = (process.env.REFRESH_TOKEN_SECRET || "CHANGE_THIS_SUPER_SECRET_ACCESS_TOKEN_SECRET");
 
-const dbConnect = require('./db');
 const User = require('./users');
 const RefreshToken = require('./refreshTokens');
+const authenticateTokenMiddleware = require('./authenticationMiddleware');
 
 console.log("Starting API server...");
 
@@ -37,14 +36,14 @@ app.get(BASE_API_PATH + "/healthz", (req, res) => {
 });
 
 app.get(BASE_API_PATH + "/users", authenticateTokenMiddleware, (req, res) => {
-    console.log(Date() + " - GET /usuarios");
+    console.log(Date() + " - GET /users");
 
     User.find({}, (err, usuarios) => {
         if (err) {
             console.log(Date() + "-" + err);
             res.sendStatus(500);
         } else {
-            res.send(usuarios.map((usuario) => {
+            res.status(200).send(usuarios.map((usuario) => {
                 return usuario.cleanup();
             }));
         }
@@ -60,7 +59,7 @@ app.post(BASE_API_PATH + "/users", (req, res) => {
             console.log(Date() + " - " + err);
             res.sendStatus(500);
         } else {
-            res.json(usr.cleanup());
+            res.status(201).json(usr.cleanup());
         }
     });
 });
@@ -172,31 +171,10 @@ function generateRefreshToken(userInfo) {
     return jwt.sign(userInfo, REFRESH_TOKEN_SECRET);
 }
 
-function authenticateTokenMiddleware(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) return res.sendStatus(401);
-
-    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, usr) => {
-        if (err) return res.sendStatus(403);
-        req.user = usr;
-        next();
-    });
-}
-
 function isTokenAuthenticated(token, callback) {
     if (!token) return callback(false);
 
     jwt.verify(token, ACCESS_TOKEN_SECRET, (err, usr) => callback(err ? false : true));
 }
 
-dbConnect().then(
-    () => {
-        app.listen(port);
-        console.log('Server ready!');
-    },
-    err => {
-        console.log('Connection error: ' + err);
-    }
-);
+module.exports = app;

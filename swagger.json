@@ -173,7 +173,7 @@
           "application/json"
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "New user is created",
             "schema": {
               "$ref": "#/definitions/UserResponse"

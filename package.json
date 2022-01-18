@@ -4,8 +4,9 @@
   "description": "API usuarios",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node run.js",
+    "test": "jest",
+    "integration": "jest -c jest.integration.config.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
   },
   "repository": {
@@ -24,5 +25,10 @@
     "mongoose": "^6.1.1",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.3.0"
+  },
+  "devDependencies": {
+    "jest": "^27.4.7",
+    "jest-extended": "^1.2.0",
+    "supertest": "^6.2.1"
   }
 }
